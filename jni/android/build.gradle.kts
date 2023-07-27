@@ -7,6 +7,8 @@ plugins {
 
 kotlin {
     explicitApi()
+
+    jvmToolchain(17)
 }
 
 dependencies {
@@ -14,6 +16,8 @@ dependencies {
 }
 
 android {
+    namespace = "fr.acinq.secp256k1.jni"
+
     defaultConfig {
         compileSdk = 33
         minSdk = 21
@@ -21,8 +25,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     externalNativeBuild {
@@ -53,11 +57,12 @@ afterEvaluate {
             create<MavenPublication>("android") {
                 artifactId = "secp256k1-kmp-jni-android"
                 from(components["release"])
-                val sourcesJar = task<Jar>("sourcesJar") {
-                    archiveClassifier.set("sources")
-                    from(android.sourceSets["main"].java.srcDirs)
-                }
-                artifact(sourcesJar)
+//                val sourcesJar = task<Jar>("sourcesJar") {
+//                    dependsOn(tasks.getByName("generateMetadataFileForAndroidPublication"))
+//                    archiveClassifier.set("sources")
+//                    from(android.sourceSets["main"].java.srcDirs)
+//                }
+//                artifact(sourcesJar)
             }
         }
     }

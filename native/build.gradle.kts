@@ -44,7 +44,6 @@ val buildSecp256k1Ios by tasks.creating(Exec::class) {
 }
 
 if (includeAndroid) {
-
     val buildSecp256k1Android by tasks.creating {
         group = "build"
         buildSecp256k1.dependsOn(this)
