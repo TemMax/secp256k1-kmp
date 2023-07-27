@@ -8,6 +8,7 @@ build/
 # Gradle
 .gradle
 local.properties
+github.properties
 .gradletasknamecache
 .cxx
 
