@@ -43,7 +43,7 @@ kotlin {
             sourceSets["androidMain"].dependencies {
                 implementation(project(":jni:android"))
             }
-            sourceSets["androidTest"].dependencies {
+            sourceSets["commonTest"].dependencies {
                 implementation(kotlin("test-junit"))
                 implementation("androidx.test.ext:junit:1.1.2")
                 implementation("androidx.test.espresso:espresso-core:3.3.0")
@@ -53,7 +53,12 @@ kotlin {
 
     linuxX64("linux")
 
-    ios()
+    iosArm64()
+    iosSimulatorArm64()
+    macosArm64()
+    macosX64()
+    watchosArm64()
+    tvosArm64()
 }
 
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: true
