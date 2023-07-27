@@ -1,24 +1,14 @@
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.dokka.Platform
 import java.util.Properties
 
 plugins {
-    kotlin("multiplatform") version "1.8.21"
+    kotlin("multiplatform") version "1.9.0"
+    id("com.android.library") version "8.1.0" apply false
     id("org.jetbrains.dokka") version "1.8.10"
     `maven-publish`
-}
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath("com.android.tools.build:gradle:7.3.1")
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin:1.8.10")
-    }
 }
 
 allprojects {
@@ -36,11 +26,13 @@ val currentOs = OperatingSystem.current()
 kotlin {
     explicitApi()
 
+    jvmToolchain(17)
+
     val commonMain by sourceSets.getting
 
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "17"
         }
     }
 
@@ -48,7 +40,7 @@ kotlin {
         compilations["main"].cinterops {
             val libsecp256k1 by creating {
                 includeDirs.headerFilterOnly(project.file("native/secp256k1/include/"))
-                tasks[interopProcessingTaskName].dependsOn(":native:buildSecp256k1${target.capitalize()}")
+                tasks[interopProcessingTaskName].dependsOn(":native:buildSecp256k1${target.capitalized()}")
             }
         }
     }
@@ -138,7 +130,7 @@ allprojects {
             configure(targets) {
                 compilations.all {
                     cinterops.all { tasks[interopProcessingTaskName].enabled = false }
-                    compileKotlinTask.enabled = false
+                    compileTaskProvider.get().enabled = false
                     tasks[processResourcesTaskName].enabled = false
                 }
                 binaries.all { linkTask.enabled = false }
@@ -207,7 +199,8 @@ allprojects {
 
     if (project.name !in listOf("native", "tests")) {
         afterEvaluate {
-            val dokkaOutputDir = buildDir.resolve("dokka")
+            val dokkaOutputDir = layout.buildDirectory.asFile.get().resolve("dokka")
+//            val dokkaOutputDir = buildDir.resolve("dokka")
 
             tasks.dokkaHtml {
                 outputDirectory.set(file(dokkaOutputDir))

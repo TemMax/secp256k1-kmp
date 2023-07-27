@@ -1,4 +1,3 @@
-
 plugins {
     kotlin("multiplatform")
     if (System.getProperty("includeAndroid")?.toBoolean() == true) {
@@ -8,6 +7,8 @@ plugins {
 
 kotlin {
     explicitApi()
+
+    jvmToolchain(17)
 
     val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: true
 
@@ -36,9 +37,9 @@ kotlin {
     }
 
     if (includeAndroid) {
-        android {
+        androidTarget {
             compilations.all {
-                kotlinOptions.jvmTarget = "1.8"
+                kotlinOptions.jvmTarget = "17"
             }
             sourceSets["androidMain"].dependencies {
                 implementation(project(":jni:android"))
@@ -64,15 +65,17 @@ kotlin {
 val includeAndroid = System.getProperty("includeAndroid")?.toBoolean() ?: true
 if (includeAndroid) {
     extensions.configure<com.android.build.gradle.LibraryExtension>("android") {
+        namespace = "fr.acinq.secp256k1.tests"
+
         defaultConfig {
-            compileSdkVersion(30)
-            minSdkVersion(21)
+            compileSdk = 33
+            minSdk = 21
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
 
         compileOptions {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
         }
 
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
