@@ -1,15 +1,19 @@
 [![Kotlin](https://img.shields.io/badge/Kotlin-1.8.21-blue.svg?style=flat&logo=kotlin)](http://kotlinlang.org)
-[![Maven Central](https://img.shields.io/maven-central/v/fr.acinq.secp256k1/secp256k1-kmp)](https://search.maven.org/search?q=g:fr.acinq.secp256k1%20a:secp256k1-kmp*)
-![Github Actions](https://github.com/ACINQ/secp256k1-kmp/actions/workflows/test.yml/badge.svg)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ACINQ/secp256k1-kmp/blob/master/LICENSE)
 
-# Secp256k1 for Kotlin/Multiplatform
+# Secp256k1 for Kotlin/Multiplatform [FORKED]
 
-Kotlin/Multiplatform wrapper for Bitcoin Core's secp256k1 library. Targets: JVM, Android, iOS & Linux.
+Kotlin/Multiplatform wrapper for Bitcoin Core's secp256k1 library. Targets: JVM, Android, iOS (+ x64 and arm64 simulator), macOS, watchOS, tvOS & Linux.
+
+### Note:
+
+This repo is a fork of the original [repo](https://github.com/ACINQ/secp256k1-kmp).
+What's changed here:
+- Added support for different Apple platforms: iOS arm64 simulator, macOS, watchOS and tvOS.
 
 ## Installation
 
-secp256k1-kmp is available on [maven central](https://search.maven.org/search?q=g:fr.acinq.secp256k1%20a:secp256k1-kmp*)
+secp256k1-kmp is available on [Github packages](https://github.com/TemMax?tab=packages&repo_name=secp256k1-kmp)
 
 Then, the actual dependency depends on your targeted platform(s):
 
@@ -24,25 +28,31 @@ kotlin {
     jvm()
     android()
     linuxX64("linux")
-    ios()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+    macosX64()
+    macosArm64()
+    watchosArm64()
+    tvosArm64()
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-common"))
-                implementation("fr.acinq.secp256k1:secp256k1-kmp:$secp256k1_version")
+                implementation("fr.acinq.secp256k1.forked:secp256k1-kmp:$secp256k1_version")
             }
         }
         val jvmMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
-                implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-jvm:$secp256k1_version")
+                implementation("fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm:$secp256k1_version")
             }
         }
         val androidMain by getting {
             dependencies {
                 implementation(kotlin("stdlib"))
-                implementation("fr.acinq.secp256k1:secp256k1-kmp-jni-android:$secp256k1_version")
+                implementation("fr.acinq.secp256k1.forked:secp256k1-kmp-jni-android:$secp256k1_version")
             }
         }
     }
@@ -51,7 +61,7 @@ kotlin {
 
 ### Native targets (iOS, linux64)
 
-Native targets include libsecp256k1, called through KMP's c-interop, simply add the `fr.acinq.secp256k1:secp256k1` dependency.
+Native targets include libsecp256k1, called through KMP's c-interop, simply add the `fr.acinq.secp256k1.forked:secp256k1` dependency.
 
 ### JVM targets & Android
 
@@ -65,15 +75,15 @@ JNI libraries are included for:
 Along this library, you **must** specify which JNI native library to use in your dependency manager:
 
 * **For desktop or server JVMs**, you must add the dependency:
-  * Either the `fr.acinq.secp256k1:secp256k1-kmp-jni-jvm` dependency which imports all supported platforms.
+  * Either the `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm` dependency which imports all supported platforms.
   * Or the platform specific dependencies (note that you can add multiple as they do not conflict):
-    * `fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-linux` for Linux
-    * `fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-darwin` for Mac OS X
-    * `fr.acinq.secp256k1:secp256k1-kmp-jni-jvm-mingw` for Windows
-* **For Android**, you must add the `fr.acinq.secp256k1:secp256k1-kmp-jni-android` dependency
+    * `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm-linux` for Linux
+    * `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm-darwin` for Mac OS X
+    * `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm-mingw` for Windows
+* **For Android**, you must add the `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-android` dependency
 
 If you are using the JVM on an OS for which we don't provide JNI bindings (32 bits OS for example), you can use your own library native library by
-adding the `fr.acinq.secp256k1:secp256k1-kmp-jni-jvm` dependency and specifying its path with `-Dfr.acinq.secp256k1.lib.path` and optionally its name with `-Dfr.acinq.secp256k1.lib.name`
+adding the `fr.acinq.secp256k1.forked:secp256k1-kmp-jni-jvm` dependency and specifying its path with `-Dfr.acinq.secp256k1.lib.path` and optionally its name with `-Dfr.acinq.secp256k1.lib.name`
 (if unspecified bitcoink use the standard name for your OS i.e. libsecp256k1.so on Linux, secp256k1.dll on Windows, ...).
 
 To compile your own JNI bindings, have a look add the `native/build.sh` and `jni/build.sh` scripts.
