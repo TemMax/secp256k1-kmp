@@ -50,28 +50,138 @@ UNIVERSAL="${PREFIX}"/universal
 # Compiler options
 OPT_FLAGS="-O3 -g3 -fembed-bitcode"
 MAKE_JOBS=8
-MIN_IOS_VERSION=10.0
+MIN_IOS_VERSION=13.0
+MIN_MACOS_VERSION=13.1
+MIN_WATCHOS_VERSION=6
+MIN_TVOS_VERSION=15.0
 
 # Build for platforms
+## Build for iphoneos platform
 SDK="iphoneos"
-PLATFORM="arm"
-PLATFORM_ARM=${PLATFORM}
-ARCH_FLAGS="-arch arm64 -arch arm64e"  # -arch armv7 -arch armv7s
+PLATFORM="arm64-iphoneos"
+PLATFORM_IOS=${PLATFORM}
+ARCH_FLAGS="-arch arm64"
 HOST_FLAGS="${ARCH_FLAGS} -miphoneos-version-min=${MIN_IOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
 CHOST="arm-apple-darwin"
 Build "$@"
 
+## Build for iphone M1/M2/Mx simulators
+SDK="iphonesimulator"
+PLATFORM="arm64-sim"
+PLATFORM_SIM_ARM=${PLATFORM}
+ARCH_FLAGS="-arch arm64"
+HOST_FLAGS="${ARCH_FLAGS} -mios-simulator-version-min=${MIN_IOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+CHOST="arm-apple-darwin"
+Build "$@"
+
+## Build for iphone intel simulators
 SDK="iphonesimulator"
 PLATFORM="x86_64-sim"
-PLATFORM_ISIM=${PLATFORM}
+PLATFORM_SIM_X86=${PLATFORM}
 ARCH_FLAGS="-arch x86_64"
 HOST_FLAGS="${ARCH_FLAGS} -mios-simulator-version-min=${MIN_IOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
 CHOST="x86_64-apple-darwin"
 Build "$@"
 
+# Build for platforms
+## Build for macosx platform x86-64
+SDK="macosx"
+PLATFORM="x86_64-macosx" # Updated this to target x86_64 architecture
+PLATFORM_MACOS_X86=${PLATFORM}
+ARCH_FLAGS="-arch x86_64" # Updated this to target x86_64 architecture
+HOST_FLAGS="${ARCH_FLAGS} -mmacosx-version-min=${MIN_MACOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+CHOST="x86_64-apple-darwin" # Updated this to specify x86_64 architecture
+Build "$@"
+
+## Build for macosx platform
+SDK="macosx"
+PLATFORM="arm64-macosx"
+PLATFORM_MACOS=${PLATFORM}
+ARCH_FLAGS="-arch arm64"
+HOST_FLAGS="${ARCH_FLAGS} -mmacosx-version-min=${MIN_MACOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+CHOST="arm-apple-darwin"
+Build "$@"
+
+## Build for watchOS device
+SDK="watchos"
+PLATFORM="arm64-watchos"
+PLATFORM_WATCH_ARM=${PLATFORM}
+ARCH_FLAGS="-arch arm64"
+HOST_FLAGS="${ARCH_FLAGS} -mwatchos-version-min=${MIN_WATCHOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+CHOST="arm-apple-darwin"
+Build "$@"
+
+## Build for watchOS M1/M2/Mx simulator
+#SDK="watchsimulator"
+#PLATFORM="arm64-watchos-sim"
+#PLATFORM_WATCH_SIM_ARM=${PLATFORM}
+#ARCH_FLAGS="-arch arm64"
+#HOST_FLAGS="${ARCH_FLAGS} -mwatchos-simulator-version-min=${MIN_WATCHOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+#CHOST="arm-apple-darwin"
+#Build "$@"
+
+## Build for watchOS intel simulator
+#SDK="watchsimulator"
+#PLATFORM="x86_64-watchos-sim"
+#PLATFORM_WATCH_SIM_X86=${PLATFORM}
+#ARCH_FLAGS="-arch x86_64"
+#HOST_FLAGS="${ARCH_FLAGS} -mwatchos-simulator-version-min=${MIN_WATCHOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+#CHOST="x86_64-apple-darwin"
+#Build "$@"
+
+## Build for tvOS device
+SDK="appletvos"
+PLATFORM="arm64-appletvos"
+PLATFORM_TV_ARM=${PLATFORM}
+ARCH_FLAGS="-arch arm64"
+HOST_FLAGS="${ARCH_FLAGS} -mappletvos-version-min=${MIN_TVOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+CHOST="arm-apple-darwin"
+Build "$@"
+
+## Build for tvOS M1/M2/Mx simulator
+#SDK="appletvsimulator"
+#PLATFORM="arm64-appletvos-sim"
+#PLATFORM_TV_SIM_ARM=${PLATFORM}
+#ARCH_FLAGS="-arch arm64"
+#HOST_FLAGS="${ARCH_FLAGS} -mappletvos-simulator-version-min=${MIN_TVOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+#CHOST="arm-apple-darwin"
+#Build "$@"
+#
+### Build for tvOS intel simulator
+#SDK="appletvsimulator"
+#PLATFORM="x86_64-appletvos-sim"
+#PLATFORM_TV_SIM_X86=${PLATFORM}
+#ARCH_FLAGS="-arch x86_64"
+#HOST_FLAGS="${ARCH_FLAGS} -mappletvos-simulator-version-min=${MIN_TVOS_VERSION} -isysroot $(xcrun --sdk ${SDK} --show-sdk-path)"
+#CHOST="x86_64-apple-darwin"
+#Build "$@"
+
 # Create universal binary
-cd "${PLATFORMS}/${PLATFORM_ARM}/lib"
-LIB_NAME=`find . -iname *.a`
-cd -
 mkdir -p "${UNIVERSAL}" &> /dev/null
-lipo -create -output "${UNIVERSAL}/${LIB_NAME}" "${PLATFORMS}/${PLATFORM_ARM}/lib/${LIB_NAME}" "${PLATFORMS}/${PLATFORM_ISIM}/lib/${LIB_NAME}"
+# A universal library can only have 1 of each arch inside.
+# Uneeded step but iphone device library
+#lipo -create -output "${UNIVERSAL}/arm64-iphoneos.a" "${PLATFORMS}/${PLATFORM_IOS}/lib/libsecp256k1.a" "${PLATFORMS}/${PLATFORM_SIM_X86}/lib/libsecp256k1.a"
+
+# ios library
+lipo -create -output "${UNIVERSAL}/arm64-iphoneos.a" "${PLATFORMS}/${PLATFORM_IOS}/lib/libsecp256k1.a"
+
+# ios simulators universal library
+lipo -create -output "${UNIVERSAL}/arm64_x86_x64-iphonesimulator.a" "${PLATFORMS}/${PLATFORM_SIM_ARM}/lib/libsecp256k1.a" "${PLATFORMS}/${PLATFORM_SIM_X86}/lib/libsecp256k1.a"
+
+# macos x86_64 library
+lipo -create -output "${UNIVERSAL}/x86_x64-macosx.a" "${PLATFORMS}/${PLATFORM_MACOS_X86}/lib/libsecp256k1.a"
+
+# macos arm64 universal library
+lipo -create -output "${UNIVERSAL}/arm64-macosx.a" "${PLATFORMS}/${PLATFORM_MACOS}/lib/libsecp256k1.a"
+
+# watchos arm64 library
+lipo -create -output "${UNIVERSAL}/arm64-watchos.a" "${PLATFORMS}/${PLATFORM_WATCH_ARM}/lib/libsecp256k1.a"
+
+# watchos simulators universal library
+#lipo -create -output "${UNIVERSAL}/arm64_x86_x64-watchossimulator.a" "${PLATFORMS}/${PLATFORM_WATCH_SIM_ARM}/lib/libsecp256k1.a" "${PLATFORMS}/${PLATFORM_WATCH_SIM_X86}/lib/libsecp256k1.a"
+
+# tvos arm64 library
+lipo -create -output "${UNIVERSAL}/arm64-tvos.a" "${PLATFORMS}/${PLATFORM_TV_ARM}/lib/libsecp256k1.a"
+
+## tvos simulators universal library
+#lipo -create -output "${UNIVERSAL}/arm64_x86_x64-tvossimulator.a" "${PLATFORMS}/${PLATFORM_TV_SIM_ARM}/lib/libsecp256k1.a" "${PLATFORMS}/${PLATFORM_TV_SIM_X86}/lib/libsecp256k1.a"
