@@ -1,4 +1,5 @@
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.8.21-blue.svg?style=flat&logo=kotlin)](http://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?style=flat&logo=kotlin)](http://kotlinlang.org)
+![GitHub release (with filter)](https://img.shields.io/github/v/release/TemMax/secp256k1-kmp?label=Current%20version&color=EF6C00)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ACINQ/secp256k1-kmp/blob/master/LICENSE)
 
 # Secp256k1 for Kotlin/Multiplatform [FORKED]
