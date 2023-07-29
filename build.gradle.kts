@@ -2,7 +2,6 @@ import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.dokka.Platform
-import java.util.Properties
 
 plugins {
     kotlin("multiplatform") version "1.9.0"
@@ -12,7 +11,7 @@ plugins {
 }
 
 allprojects {
-    group = "fr.acinq.secp256k1.forked"
+    group = "com.duglasher.secp256k1"
     version = "0.10.2"
 
     repositories {
@@ -154,18 +153,7 @@ allprojects {
     // Publication
     plugins.withId("maven-publish") {
         publishing {
-            repositories {
-                maven {
-                    name = "Github"
-                    setUrl("https://maven.pkg.github.com/TemMax/secp256k1-kmp")
-                    credentials {
-                        username = getGithubProperty("github_user") ?: System.getenv("GITHUB_USER")
-                        password = getGithubProperty("github_token") ?: System.getenv("GITHUB_TOKEN")
-                    }
-                }
-            }
-
-            publications.withType<MavenPublication>() {
+            publications.withType<MavenPublication>().configureEach {
                 version = project.version as String
                 group = project.group
 
@@ -175,6 +163,12 @@ allprojects {
                     name.set("secp256k1 for Kotlin/Multiplatform")
                     description.set("Bitcoin's secp256k1 library ported to Kotlin/Multiplatform for JVM, Android, iOS (+ x64 and arm64 simulator), macOS, watchOS, tvOS & Linux")
                     url.set("https://github.com/TemMax/secp256k1-kmp")
+                    licenses {
+                        license {
+                            name.set("Apache License v2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0")
+                        }
+                    }
                     issueManagement {
                         system.set("Github")
                         url.set("https://github.com/TemMax/secp256k1-kmp/issues")
@@ -184,10 +178,6 @@ allprojects {
                         url.set("https://github.com/TemMax/secp256k1-kmp")
                     }
                     developers {
-                        developer {
-                            name.set("ACINQ")
-                            email.set("hello@acinq.co")
-                        }
                         developer {
                             name.set("TemMax")
                         }
@@ -235,7 +225,7 @@ allprojects {
 
 allprojects {
     afterEvaluate {
-        tasks.withType<AbstractTestTask>() {
+        tasks.withType<AbstractTestTask> {
             testLogging {
                 events("passed", "skipped", "failed", "standard_out", "standard_error")
                 showExceptions = true
@@ -243,12 +233,4 @@ allprojects {
             }
         }
     }
-}
-
-fun getGithubProperty(key: String): String? {
-    val properties = Properties()
-    val propertiesFile = rootProject.file("github.properties")
-    if (!propertiesFile.exists()) return null
-    propertiesFile.inputStream().use(properties::load)
-    return properties.getProperty(key)
 }

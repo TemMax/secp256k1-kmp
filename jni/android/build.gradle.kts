@@ -55,13 +55,17 @@ afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("android") {
-                artifactId = "secp256k1-kmp-jni-android"
-                from(components["release"])
-//                val sourcesJar = task<Jar>("sourcesJar") {
-//                    dependsOn(tasks.getByName("generateMetadataFileForAndroidPublication"))
+//                val sourcesJar = task<Jar>("androidSourcesJar") {
+//                    //                    dependsOn(tasks.getByName("generateMetadataFileForAndroidPublication"))
 //                    archiveClassifier.set("sources")
 //                    from(android.sourceSets["main"].java.srcDirs)
 //                }
+
+//                tasks.named("generateMetadataFileForAndroidPublication").configure { dependsOn("androidSourcesJar") }
+
+                artifactId = "secp256k1-kmp-jni-android"
+                from(components["release"])
+
 //                artifact(sourcesJar)
             }
         }
