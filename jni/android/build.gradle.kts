@@ -51,22 +51,23 @@ afterEvaluate {
     }
 }
 
+val androidSourcesJar = task<Jar>("androidSourcesJar") {
+    archiveClassifier.set("sources")
+    from(android.sourceSets["main"].java.srcDirs)
+}
+
+artifacts {
+    archives(androidSourcesJar)
+}
+
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("android") {
-//                val sourcesJar = task<Jar>("androidSourcesJar") {
-//                    //                    dependsOn(tasks.getByName("generateMetadataFileForAndroidPublication"))
-//                    archiveClassifier.set("sources")
-//                    from(android.sourceSets["main"].java.srcDirs)
-//                }
-
-//                tasks.named("generateMetadataFileForAndroidPublication").configure { dependsOn("androidSourcesJar") }
+                tasks.named("generateMetadataFileForAndroidPublication").configure { dependsOn("androidSourcesJar") }
 
                 artifactId = "secp256k1-kmp-jni-android"
                 from(components["release"])
-
-//                artifact(sourcesJar)
             }
         }
     }

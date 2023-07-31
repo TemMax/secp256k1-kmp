@@ -14,7 +14,7 @@ kotlin {
 
     val commonMain by sourceSets.getting {
         dependencies {
-            implementation(rootProject)
+            implementation(project(":secp256k1-kmp"))
         }
     }
     val commonTest by sourceSets.getting {
@@ -83,6 +83,38 @@ if (includeAndroid) {
         afterEvaluate {
             tasks.withType<com.android.build.gradle.tasks.factory.AndroidUnitTest>().all {
                 enabled = false
+            }
+        }
+    }
+}
+
+// Disable cross compilation
+allprojects {
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        afterEvaluate {
+            val currentOs = org.gradle.internal.os.OperatingSystem.current()
+            val targetsToExclude = when {
+                currentOs.isLinux   -> listOf()
+                currentOs.isMacOsX  -> listOf("linux")
+                currentOs.isWindows -> listOf("linux")
+                else                -> listOf("linux")
+            }.mapNotNull { kotlin.targets.findByName(it) as? org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget }
+
+            configure(targetsToExclude) {
+                compilations.all {
+                    cinterops.all { tasks[interopProcessingTaskName].enabled = false }
+                    compileTaskProvider.get().enabled = false
+                    tasks[processResourcesTaskName].enabled = false
+                }
+                binaries.all { linkTask.enabled = false }
+
+                mavenPublication {
+                    val publicationToDisable = this
+                    tasks.withType<AbstractPublishToMaven>()
+                        .all { onlyIf { publication != publicationToDisable } }
+                    tasks.withType<GenerateModuleMetadata>()
+                        .all { onlyIf { publication.get() != publicationToDisable } }
+                }
             }
         }
     }
