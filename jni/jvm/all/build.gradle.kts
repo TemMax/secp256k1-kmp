@@ -1,7 +1,6 @@
 plugins {
     `java-library`
-    id("org.jetbrains.dokka")
-    `maven-publish`
+    id("publication.convention")
 }
 
 dependencies {

@@ -4,8 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.dokka")
-    `maven-publish`
+    id("publication.convention")
 }
 
 kotlin {
@@ -122,6 +121,11 @@ kotlin {
     sourceSets.all {
         languageSettings.optIn("kotlin.RequiresOptIn")
     }
+}
+
+// Sign first, publish after
+tasks.withType<AbstractPublishToMaven> {
+    dependsOn(tasks.withType<Sign>())
 }
 
 // Disable cross compilation
