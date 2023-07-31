@@ -1,8 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("android")
-    id("org.jetbrains.dokka")
-    `maven-publish`
+    id("publication.convention")
 }
 
 kotlin {

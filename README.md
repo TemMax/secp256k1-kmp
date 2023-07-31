@@ -11,6 +11,7 @@ Kotlin/Multiplatform wrapper for Bitcoin Core's secp256k1 library. Targets: JVM,
 This repo is a fork of the original [repo](https://github.com/ACINQ/secp256k1-kmp).
 What's changed here:
 - Added support for different Apple platforms: iOS arm64 simulator, macOS, watchOS and tvOS.
+- Currently, the package name is still `fr.acing.sekp256k1`. It's no sense to change it to another, and with the original package name, it's easier to update from the original library.
 
 ## Installation
 
