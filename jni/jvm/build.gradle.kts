@@ -20,7 +20,6 @@ val buildNativeHost by tasks.creating(Exec::class) {
     }
 
     inputs.files(projectDir.resolve("build.sh"))
-//    outputs.dir(buildDir.resolve(target))
     outputs.dir(layout.buildDirectory.asFile.get().resolve(target))
 
     workingDir = projectDir
@@ -47,7 +46,6 @@ publishing {
 
 afterEvaluate {
     tasks["clean"].doLast {
-//        delete("$buildDir/build/cmake")
         delete("${layout.buildDirectory.asFile.get()}/build/cmake")
     }
 }

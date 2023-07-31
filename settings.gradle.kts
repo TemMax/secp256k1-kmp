@@ -11,6 +11,15 @@ pluginManagement {
 //        }
 //    }
 }
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 rootProject.name = "secp256k1-kmp"
 
 // We use a property defined in `local.properties` to know whether we should build the android application or not.
@@ -24,6 +33,7 @@ val skipAndroid = File("$rootDir/local.properties").takeIf { it.exists() }
 System.setProperty("includeAndroid", (!skipAndroid).toString())
 
 include(
+    ":secp256k1-kmp",
     ":native",
     ":jni",
     ":jni:jvm",
