@@ -57,7 +57,7 @@ publishing {
 
     publications.withType<MavenPublication> {
         group = "com.duglasher.secp256k1"
-        version = "0.10.2"
+        version = "0.11.0"
 
         artifact(javadocJar.get())
 
